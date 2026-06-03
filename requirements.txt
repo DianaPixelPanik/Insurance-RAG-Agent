@@ -1,0 +1,17 @@
+agno
+anthropic
+openai
+python-dotenv
+psycopg2
+pymilvus
+chromadb
+flask
+streamlit
+requests
+sqlalchemy
+pypdf
+chonkie
+lancedb
+tantivy
+reportlab
+pandas
