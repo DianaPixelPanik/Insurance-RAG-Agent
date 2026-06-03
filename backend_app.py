@@ -1,13 +1,17 @@
-from agno.embedder.openai import OpenAIEmbedder
-from agno.agent import Agent, RunResponse
-from agno.knowledge.pdf import PDFKnowledgeBase
+from agno.knowledge.embedder.openai import OpenAIEmbedder
+from agno.agent import Agent
+from agno.run.agent import RunOutput
+from agno.knowledge.knowledge import Knowledge
+from agno.knowledge.reader.pdf_reader import PDFReader
 from agno.vectordb.chroma import ChromaDb
-from agno.document.chunking.document import DocumentChunking
-from agno.storage.sqlite import SqliteStorage
+from agno.knowledge.chunking.document import DocumentChunking
+from agno.db.sqlite.sqlite import SqliteDb
 from agno.models.anthropic import Claude
-from agno.memory.v2 import Memory
-from agno.memory.v2.db.sqlite import SqliteMemoryDb
 from flask import Flask, request, jsonify
+import anthropic
+import base64
+import json
+import re
 import traceback
 import os
 from dotenv import load_dotenv
@@ -17,28 +21,24 @@ load_dotenv()
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-agent_storage = SqliteStorage(
-    table_name="agent_sessions",
-    db_file="database_files/agent_storage.db",
-    auto_upgrade_schema=True,
-)
+os.makedirs("database_files", exist_ok=True)
 
-memory_db = SqliteMemoryDb(
-    table_name="memories",
-    db_file="database_files/memory.db",
+agent_db = SqliteDb(
+    db_file="database_files/agent_storage.db",
+    session_table="agent_sessions",
+    memory_table="memories",
 )
 
 openai_embedder = OpenAIEmbedder(id="text-embedding-3-large", api_key=OPENAI_API_KEY)
 
-knowledge_base = PDFKnowledgeBase(
-    path="data",
+knowledge_base = Knowledge(
     vector_db=ChromaDb(
         collection="insurance_customers_details",
         path="database_files/insurance_data",
         persistent_client=True,
         embedder=openai_embedder,
     ),
-    chunking_strategy=DocumentChunking(),
+    readers={"pdf": PDFReader(chunking_strategy=DocumentChunking())},
 )
 
 with open("agent_instructions.txt", "r", encoding="utf-8") as f:
@@ -46,14 +46,11 @@ with open("agent_instructions.txt", "r", encoding="utf-8") as f:
 
 agent = Agent(
     model=Claude(id="claude-sonnet-4-5", api_key=ANTHROPIC_API_KEY),
-    memory=Memory(db=memory_db),
-    storage=agent_storage,
+    db=agent_db,
     knowledge=knowledge_base,
     search_knowledge=True,
-    show_tool_calls=True,
-    add_history_to_messages=True,
+    add_history_to_context=True,
     num_history_runs=3,
-    num_history_responses=3,
     enable_user_memories=True,
     enable_session_summaries=True,
     read_chat_history=True,
@@ -81,7 +78,7 @@ def handle_query():
     print(f"Received user input from user '{user_id}': '{user_input}'")
 
     try:
-        response: RunResponse = agent.run(user_input, user_id=user_id)
+        response: RunOutput = agent.run(user_input, user_id=user_id)
 
         if response and hasattr(response, "content"):
             agent_response_text = response.content
@@ -97,7 +94,87 @@ def handle_query():
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
 
 
+DAMAGE_ANALYSIS_PROMPT = """You are an expert automotive damage assessor with 20+ years of experience in vehicle repair and insurance claims.
+
+Analyze this vehicle damage photo and return a JSON object with this exact structure:
+{
+  "vehicle_description": "brief description of vehicle and overall condition",
+  "overall_severity": "low|medium|high|critical",
+  "confidence": 0.0-1.0,
+  "damaged_parts": [
+    {
+      "part": "part name in English",
+      "severity": "low|medium|high|critical",
+      "description": "what exactly is damaged",
+      "repair_type": "repair|replace|paint|align",
+      "cost_min": integer USD,
+      "cost_max": integer USD
+    }
+  ],
+  "total_cost_min": integer USD,
+  "total_cost_max": integer USD,
+  "repair_time_days": "X-Y days",
+  "can_drive": true or false,
+  "safety_concerns": ["list any safety issues"],
+  "recommendations": ["actionable next steps"]
+}
+
+Rules:
+- List every visibly damaged part separately
+- Cost estimates must be realistic USD market rates (US/Europe)
+- severity: low=minor scratches, medium=dents/moderate damage, high=structural/major, critical=totaled
+- can_drive=false if airbags deployed, frame bent, or wheels/steering damaged
+- Return ONLY the JSON, no other text"""
+
+
+@app.route("/analyze-damage", methods=["POST"])
+def analyze_damage():
+    data = request.get_json()
+    if not data or "image_b64" not in data:
+        return jsonify({"error": "Missing image_b64"}), 400
+
+    image_b64 = data["image_b64"]
+    media_type = data.get("media_type", "image/jpeg")
+
+    try:
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        message = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=2048,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": media_type,
+                                "data": image_b64,
+                            },
+                        },
+                        {"type": "text", "text": DAMAGE_ANALYSIS_PROMPT},
+                    ],
+                }
+            ],
+        )
+
+        raw = message.content[0].text.strip()
+        # Strip markdown code fences if present
+        raw = re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
+        result = json.loads(raw)
+        return jsonify(result)
+
+    except json.JSONDecodeError as e:
+        return jsonify({"error": "Model returned invalid JSON", "details": str(e)}), 500
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Analysis failed", "details": str(e)}), 500
+
+
 if __name__ == "__main__":
-    # Comment out after the first run once knowledge base is loaded
-    knowledge_base.load(recreate=False, skip_existing=True)
+    # Load PDFs from data/ folder into knowledge base (skip existing on subsequent runs)
+    if os.path.isdir("data") and any(f.endswith(".pdf") for f in os.listdir("data")):
+        knowledge_base.insert(path="data", skip_if_exists=True)
     app.run(debug=True, port=8000)

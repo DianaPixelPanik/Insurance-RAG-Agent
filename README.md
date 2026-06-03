@@ -1,4 +1,4 @@
-# 🛡️ InsurAI — Intelligent Insurance Automation System
+# InsurAI — Intelligent Insurance Automation System
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Claude](https://img.shields.io/badge/Claude-Anthropic-D97757?style=flat-square&logo=anthropic&logoColor=white)
@@ -13,18 +13,18 @@ An end-to-end InsurTech platform that combines **computer vision**, **retrieval-
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
-- **🔍 Computer Vision Damage Assessment** — Upload a photo of a damaged vehicle; Claude Vision automatically identifies damaged parts, severity levels, and estimated repair costs
-- **📄 PDF Report Generation** — Download a professional damage assessment report or claim receipt with a single click
-- **🤖 RAG Insurance Assistant** — Ask natural-language questions about policies, customers, and claims; answers are retrieved from your PDF knowledge base via ChromaDB vector search
-- **📋 AI-Guided Claims Workflow** — A three-step claim filing flow: incident chat → Pledge of Honesty → instant claim decision
-- **🧠 Session Memory** — Claude remembers conversation context across turns using SQLite-backed agent storage
-- **⚡ Real-Time Streaming** — Responses stream character-by-character for a natural conversational feel
+- **Computer Vision Damage Assessment** — Upload a photo of a damaged vehicle; Claude Vision automatically identifies damaged parts, severity levels, and estimated repair costs
+- **PDF Report Generation** — Download a professional damage assessment report or claim receipt with a single click
+- **RAG Insurance Assistant** — Ask natural-language questions about policies, customers, and claims; answers are retrieved from your PDF knowledge base via ChromaDB vector search
+- **AI-Guided Claims Workflow** — A three-step claim filing flow: incident chat → Pledge of Honesty → instant claim decision
+- **Session Memory** — Claude remembers conversation context across turns using SQLite-backed agent storage
+- **Real-Time Streaming** — Responses stream character-by-character for a natural conversational feel
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -54,7 +54,7 @@ An end-to-end InsurTech platform that combines **computer vision**, **retrieval-
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Insurance-RAG-Agent/
@@ -75,7 +75,7 @@ Insurance-RAG-Agent/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -157,9 +157,9 @@ The app opens at **http://localhost:8501**
 
 ---
 
-## 🖥️ Application Tabs
+## Application Tabs
 
-### 🔍 Tab 1 — Damage Analysis
+### Tab 1 — Damage Analysis
 
 | Step | Action |
 |------|--------|
@@ -174,7 +174,7 @@ The app opens at **http://localhost:8501**
 - Safety concerns and actionable recommendations
 - AI confidence score and estimated repair time
 
-### 📋 Tab 2 — File a Claim
+### Tab 2 — File a Claim
 
 A guided, three-step claim filing workflow:
 
@@ -186,7 +186,7 @@ A guided, three-step claim filing workflow:
 
 > **Pledge of Honesty** is a psychological anti-fraud mechanism — users affirm they are only claiming genuine losses before submission.
 
-### 💬 Tab 3 — Insurance Chat
+### Tab 3 — Insurance Chat
 
 Natural-language Q&A over your insurance knowledge base:
 
@@ -204,7 +204,7 @@ Agent: Searches ChromaDB → Extracts answer → "John Smith's policy number is 
 
 ---
 
-## 🧠 AI Components
+## AI Components
 
 | Component | Model | Purpose |
 |-----------|-------|---------|
@@ -216,7 +216,7 @@ Agent: Searches ChromaDB → Extracts answer → "John Smith's policy number is 
 
 ---
 
-## 📦 Core Dependencies
+## Core Dependencies
 
 | Package | Purpose |
 |---------|---------|
@@ -233,7 +233,7 @@ Agent: Searches ChromaDB → Extracts answer → "John Smith's policy number is 
 
 ---
 
-## 🔒 Security Notes
+## Security Notes
 
 - **Never commit `.env`** — it contains your API keys. The `.gitignore` should exclude it.
 - Rotate API keys immediately if accidentally exposed in public repositories or chats.
@@ -241,7 +241,7 @@ Agent: Searches ChromaDB → Extracts answer → "John Smith's policy number is 
 
 ---
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 - [ ] Video damage assessment (frame-by-frame analysis)
 - [ ] Multi-vehicle support in a single claim
@@ -254,7 +254,7 @@ Agent: Searches ChromaDB → Extracts answer → "John Smith's policy number is 
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/your-feature-name`
@@ -264,14 +264,14 @@ Agent: Searches ChromaDB → Extracts answer → "John Smith's policy number is 
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👤 Author
+## Author
 
-Built with ❤️ using [Anthropic Claude](https://anthropic.com) and [Agno](https://github.com/agno-agi/agno).
+Built with [Anthropic Claude](https://anthropic.com) and [Agno](https://github.com/agno-agi/agno).
 
 *Inspired by the InsurTech industry's push toward AI-driven claims automation and instant settlements.*
