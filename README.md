@@ -157,6 +157,24 @@ The app opens at **http://localhost:8501**
 
 ---
 
+## Application Screenshots
+
+The application features a modern, enterprise-grade React interface with Material-UI design patterns.
+
+### Accident Report — Step 1 (Incident Details)
+![Accident Report Form](frontend/public/2026-06-04%2013.40.50.jpg)
+The guided accident reporting wizard with card-based form sections, date/time picker, location details with OpenStreetMap integration, injury assessment with clickable Yes/No cards, property damage evaluation, and witness information input — all with multilingual support.
+
+### Vehicle Damage Assessment — Analysis Summary
+![Damage Analysis Results](frontend/public/2026-06-04%2013.41.03.jpg)
+Professional damage analysis results showing repair cost estimates (€4,550–€7,650), repair time forecast (7-12 days), confidence score (85%), and detailed component breakdown table with damage severity indicators.
+
+### Damage Analysis — Upload & Preview
+![Upload Workspace](frontend/public/2026-06-04%2013.41.09.jpg)
+Responsive two-column workspace layout with image preview (zoom 50-200%), file upload management, workflow stepper showing upload → analysis → review stages, and real-time damage detection visualization.
+
+---
+
 ## Application Tabs
 
 ### Tab 1 — Damage Analysis
