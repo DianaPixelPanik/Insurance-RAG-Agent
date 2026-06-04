@@ -9,7 +9,7 @@
 ![ReportLab](https://img.shields.io/badge/ReportLab-PDF-red?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-An end-to-end InsurTech platform that combines **computer vision**, **retrieval-augmented generation (RAG)**, and an **AI-guided claims workflow** to automate vehicle damage assessment, insurance knowledge retrieval, and claim filing — powered by Anthropic Claude.
+An end-to-end InsurTech platform that combines **computer vision**, **retrieval-augmented generation (RAG)**, and an **AI-guided claims workflow** to automate vehicle damage assessment, insurance knowledge retrieval, and claim filing 
 
 ---
 
